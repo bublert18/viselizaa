@@ -1,0 +1,1098 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Математическая виселица</title>
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #fff0f5, #e9f3ff);
+  color: #352d48;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 25px 15px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+h1 { margin: 0; font-size: 28px; }
+.subtitle { color: #82788e; margin-top: 6px; }
+
+button {
+  border: none;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 12px 17px;
+  font-weight: bold;
+  transition: .2s;
+}
+
+button:hover { transform: translateY(-2px); }
+
+.primary {
+  background: #8d78e8;
+  color: white;
+}
+
+.secondary {
+  background: #eee9ff;
+  color: #6653b5;
+}
+
+.white {
+  background: white;
+  color: #514866;
+  border: 1px solid #eee5f1;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 20px;
+}
+
+.panel {
+  background: white;
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px #69558b12;
+}
+
+.level-button {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 9px;
+  background: #f7f4ff;
+  color: #493f63;
+}
+
+.level-button.active {
+  background: #e9e1ff;
+  outline: 2px solid #a28eec;
+}
+
+.level-button small {
+  display: block;
+  margin-top: 5px;
+  color: #887e99;
+  font-weight: normal;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.stat {
+  background: #fff5ef;
+  padding: 14px;
+  border-radius: 13px;
+}
+
+.stat strong {
+  display: block;
+  font-size: 23px;
+}
+
+.stat span {
+  font-size: 12px;
+  color: #887e99;
+}
+
+.game {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px #69558b12;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.game-header h2 { margin: 5px 0; }
+
+.tag {
+  background: #f0ebff;
+  color: #7561c4;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.progress {
+  height: 8px;
+  background: #eeeaf3;
+  border-radius: 10px;
+  margin: 18px 0;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #ff83a8, #8d78e8);
+  transition: .3s;
+}
+
+.play-area {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 25px;
+  align-items: center;
+}
+
+.drawing {
+  background: #f3f0ff;
+  border-radius: 18px;
+  padding: 10px;
+  text-align: center;
+}
+
+svg { width: 100%; }
+
+.gallows {
+  stroke: #766a8e;
+  stroke-width: 7;
+  stroke-linecap: round;
+  fill: none;
+}
+
+.person {
+  stroke: #f078a0;
+  stroke-width: 6;
+  stroke-linecap: round;
+  fill: none;
+  opacity: 0;
+}
+
+.person.show { opacity: 1; }
+
+.question {
+  background: #fff7ee;
+  padding: 18px;
+  border-radius: 15px;
+  border: 1px solid #ffebd9;
+}
+
+.question-label {
+  font-size: 11px;
+  color: #b18a65;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.question-text {
+  font-size: 17px;
+  line-height: 1.5;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.word {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 25px 0;
+}
+
+.letter {
+  width: 32px;
+  height: 42px;
+  border-bottom: 3px solid #a895e8;
+  display: grid;
+  place-items: center;
+  font-size: 23px;
+  font-weight: bold;
+}
+
+.letter.space {
+  border: none;
+  width: 12px;
+}
+
+.keyboard {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.key {
+  padding: 11px 2px;
+  background: #f0ebff;
+  color: #6653b5;
+  border-radius: 9px;
+  font-size: 14px;
+}
+
+.key:disabled {
+  opacity: .3;
+  cursor: default;
+}
+
+.key.good {
+  background: #d9f5e9;
+  color: #268666;
+}
+
+.key.bad {
+  background: #ffe3e7;
+  color: #c84f65;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.feedback {
+  display: none;
+  padding: 15px;
+  border-radius: 13px;
+  margin-top: 18px;
+  line-height: 1.5;
+}
+
+.feedback.show { display: block; }
+.success { background: #e4f8ed; color: #267b5d; }
+.failure { background: #fff0f0; color: #b34d59; }
+.info { background: #f0ebff; color: #6554ad; }
+
+.hint-text {
+  font-size: 13px;
+  color: #82788e;
+  margin-top: 10px;
+  min-height: 18px;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #29213d99;
+  z-index: 10;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+
+.modal.open { display: flex; }
+
+.modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal input,
+.modal select,
+.modal textarea {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid #e5ddec;
+  border-radius: 10px;
+  margin: 7px 0 14px;
+  font: inherit;
+}
+
+.modal textarea { min-height: 80px; }
+
+.custom-item {
+  padding: 12px;
+  border: 1px solid #eee5f1;
+  border-radius: 12px;
+  margin-top: 8px;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+@media(max-width:750px) {
+  .layout { grid-template-columns: 1fr; }
+  .play-area { grid-template-columns: 1fr; }
+  .drawing { max-width: 260px; margin: auto; }
+  h1 { font-size: 23px; }
+}
+
+@media(max-width:400px) {
+  .key { padding: 10px 0; }
+  .game { padding: 15px; }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <div>
+    <h1>🎯 Математическая виселица</h1>
+    <div class="subtitle">Математическая игра · 7 класс</div>
+  </div>
+  <div>
+    <button class="white" onclick="showStats()">Результаты</button>
+    <button class="secondary" onclick="openEditor()">⚙ Учитель</button>
+  </div>
+</header>
+
+<div class="layout">
+
+<aside class="panel">
+  <h3>Уровни игры</h3>
+  <div id="levels"></div>
+
+  <div class="stats">
+    <div class="stat">
+      <strong id="score">0</strong>
+      <span>Баллы</span>
+    </div>
+    <div class="stat">
+      <strong id="solved">0</strong>
+      <span>Угадано</span>
+    </div>
+  </div>
+
+  <button class="white" style="width:100%;margin-top:15px"
+    onclick="startLevel(currentLevel)">
+    ↻ Начать заново
+  </button>
+</aside>
+
+<main class="game">
+
+  <div class="game-header">
+    <div>
+      <div class="tag" id="levelNumber">УРОВЕНЬ 1</div>
+      <h2 id="levelTitle">Алгебраические выражения</h2>
+    </div>
+    <div class="tag" id="mistakes">Ошибки: 0/6</div>
+  </div>
+
+  <div class="progress">
+    <div class="progress-bar" id="progress"></div>
+  </div>
+
+  <div class="play-area">
+
+    <div class="drawing">
+      <svg viewBox="0 0 220 220">
+        <path class="gallows"
+          d="M25 195 H145 M55 195 V22 H145 V45 M55 48 L82 22"/>
+
+        <circle class="person" id="head"
+          cx="145" cy="65" r="19"/>
+
+        <path class="person" id="body"
+          d="M145 84 V137"/>
+
+        <path class="person" id="arm1"
+          d="M145 98 L116 120"/>
+
+        <path class="person" id="arm2"
+          d="M145 98 L174 120"/>
+
+        <path class="person" id="leg1"
+          d="M145 137 L119 171"/>
+
+        <path class="person" id="leg2"
+          d="M145 137 L171 171"/>
+      </svg>
+    </div>
+
+    <div>
+      <div class="question">
+        <div class="question-label" id="questionType">
+          МАТЕМАТИЧЕСКОЕ ОПРЕДЕЛЕНИЕ
+        </div>
+        <div class="question-text" id="question">
+          Загружаем задание...
+        </div>
+        <div class="hint-text" id="hintText">
+          Подсказка доступна за 2 балла.
+        </div>
+      </div>
+
+      <div class="word" id="word"></div>
+      <div class="keyboard" id="keyboard"></div>
+    </div>
+
+  </div>
+
+  <div class="actions">
+    <button class="secondary" id="hintButton" onclick="useHint()">
+      💡 Подсказка −2 балла
+    </button>
+
+    <button class="primary" id="nextButton"
+      onclick="nextQuestion()" disabled>
+      Следующее слово →
+    </button>
+  </div>
+
+  <div class="feedback" id="feedback"></div>
+
+</main>
+</div>
+</div>
+
+<!-- РЕДАКТОР УЧИТЕЛЯ -->
+
+<div class="modal" id="editor">
+<div class="modal-content">
+
+  <h2>⚙ Редактор учителя</h2>
+
+  <p>Добавляй собственные математические задания.</p>
+
+  <label>Уровень</label>
+  <select id="editLevel">
+    <option value="0">Алгебраические выражения</option>
+    <option value="1">Дроби и степени</option>
+    <option value="2">Геометрия</option>
+    <option value="3">Функции и графики</option>
+    <option value="4">Математический микс</option>
+  </select>
+
+  <label>Тип задания</label>
+  <select id="editType">
+    <option value="definition">Определение</option>
+    <option value="example">Пример или формула</option>
+  </select>
+
+  <label>Вопрос</label>
+  <textarea id="editQuestion"
+    placeholder="Введите математическое определение или пример"></textarea>
+
+  <label>Правильный ответ (одно слово)</label>
+  <input id="editAnswer" placeholder="Например: коэффициент">
+
+  <label>Подсказка</label>
+  <input id="editHint" placeholder="Введите подсказку">
+
+  <button class="primary" onclick="addQuestion()">
+    Добавить задание
+  </button>
+
+  <h3>Мои задания</h3>
+  <div id="customQuestions"></div>
+
+  <button class="white" style="margin-top:15px"
+    onclick="closeEditor()">Закрыть</button>
+
+</div>
+</div>
+
+<!-- РЕЗУЛЬТАТЫ -->
+
+<div class="modal" id="statistics">
+<div class="modal-content">
+  <h2>🏆 Результаты игры</h2>
+  <div class="stats">
+    <div class="stat">
+      <strong id="totalScore">0</strong>
+      <span>Всего баллов</span>
+    </div>
+    <div class="stat">
+      <strong id="totalSolved">0</strong>
+      <span>Угадано слов</span>
+    </div>
+    <div class="stat">
+      <strong id="totalPlayed">0</strong>
+      <span>Раундов</span>
+    </div>
+    <div class="stat">
+      <strong id="accuracy">0%</strong>
+      <span>Точность</span>
+    </div>
+  </div>
+  <button class="white" style="margin-top:15px"
+    onclick="closeStats()">Закрыть</button>
+</div>
+</div>
+
+<script>
+
+// =============================
+// НАСТРОЙКИ И ДАННЫЕ
+// =============================
+
+const levelNames = [
+  "Алгебраические выражения",
+  "Дроби и степени",
+  "Геометрия",
+  "Функции и графики",
+  "Математический микс"
+];
+
+const defaultQuestions = [
+
+[
+["Число, которое умножается на переменную в одночлене.","коэффициент","Например, в выражении 5x это число 5.","definition"],
+["Буква, обозначающая неизвестное или изменяющееся число.","переменная","Часто обозначается буквами x или y.","definition"],
+["Сумма одночленов.","многочлен","Слово состоит из частей «много» и «член».","definition"],
+["Упростите выражение: 3x + 5x.","восемь","Ответ получится 8x. Назовите число перед x.","example"],
+["Числовой множитель буквенной части одночлена.","коэффициент","В −7ab это число −7.","definition"]
+],
+
+[
+["Часть целого, записанная с помощью числителя и знаменателя.","дробь","У неё есть дробная черта.","definition"],
+["Число над дробной чертой.","числитель","Оно показывает, сколько частей взяли.","definition"],
+["Число под дробной чертой.","знаменатель","Оно показывает, на сколько частей разделили целое.","definition"],
+["Чему равно 2 в третьей степени?","восемь","Два умножить на себя три раза.","example"],
+["Число, показывающее, сколько раз основание берётся множителем.","показатель","Записывается маленькой цифрой сверху.","definition"]
+],
+
+[
+["Отрезок, соединяющий вершину треугольника с серединой противоположной стороны.","медиана","Начинается на букву М.","definition"],
+["Луч, делящий угол на две равные части.","биссектриса","Делит угол пополам.","definition"],
+["Перпендикуляр, проведённый из вершины треугольника к противоположной стороне.","высота","В треугольнике их три.","definition"],
+["Сумма длин всех сторон многоугольника.","периметр","Обозначается буквой P.","definition"],
+["Угол величиной 90 градусов.","прямой","Такой угол можно увидеть в углу тетради.","definition"]
+],
+
+[
+["Зависимость, при которой каждому значению x соответствует единственное значение y.","функция","Обычно записывается y = f(x).","definition"],
+["Независимая переменная функции.","аргумент","Обычно обозначается x.","definition"],
+["Чертёж, показывающий зависимость y от x.","график","Его строят на координатной плоскости.","definition"],
+["Точка пересечения координатных осей.","начало","Вторая часть названия — координат.","definition"],
+["Запись y = 2x задаёт линейную...","функция","Слово обозначает зависимость.","example"]
+],
+
+[
+["Число, которое делят на другое число.","делимое","В записи 24 : 6 это число 24.","definition"],
+["Результат деления.","частное","В записи 24 : 6 = 4 это число 4.","definition"],
+["Равенство, содержащее неизвестное число.","уравнение","Его обычно решают, находя x.","definition"],
+["Число, которое прибавляют к другому.","слагаемое","В сумме таких чисел два или больше.","definition"],
+["Самая длинная сторона прямоугольного треугольника.","гипотенуза","Она лежит напротив прямого угла.","definition"]
+]
+
+];
+
+const alphabet = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя".split("");
+
+let customQuestions =
+  JSON.parse(localStorage.getItem("hangmanCustom") || "[]");
+
+let stats =
+  JSON.parse(localStorage.getItem("hangmanStats") ||
+  '{"score":0,"solved":0,"played":0,"wrong":0}');
+
+let currentLevel = 0;
+let questions = [];
+let questionIndex = 0;
+let answer = "";
+let guessed = [];
+let mistakes = 0;
+let finished = false;
+let hintUsed = false;
+
+// =============================
+// ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+// =============================
+
+function saveData() {
+  localStorage.setItem("hangmanCustom",
+    JSON.stringify(customQuestions));
+
+  localStorage.setItem("hangmanStats",
+    JSON.stringify(stats));
+}
+
+function shuffle(array) {
+  return [...array].sort(() => Math.random() - 0.5);
+}
+
+function normalize(text) {
+  return text.toLowerCase()
+    .replace(/ё/g, "е");
+}
+
+function allQuestions(level) {
+  const defaults = defaultQuestions[level].map((q, i) => ({
+    id: "default-" + level + "-" + i,
+    question: q[0],
+    answer: q[1],
+    hint: q[2],
+    type: q[3]
+  }));
+
+  const custom = customQuestions.filter(
+    q => q.level === level
+  );
+
+  return [...defaults, ...custom];
+}
+
+// =============================
+// УРОВНИ
+// =============================
+
+function renderLevels() {
+  const container = document.getElementById("levels");
+
+  container.innerHTML = "";
+
+  levelNames.forEach((name, index) => {
+    const button = document.createElement("button");
+
+    button.className =
+      "level-button " +
+      (index === currentLevel ? "active" : "");
+
+    button.innerHTML =
+      `<b>Уровень ${index + 1}</b>
+       <small>${name}</small>`;
+
+    button.onclick = () => startLevel(index);
+
+    container.appendChild(button);
+  });
+}
+
+function startLevel(level) {
+  currentLevel = level;
+  questions = shuffle(allQuestions(level));
+  questionIndex = 0;
+
+  renderLevels();
+  loadQuestion();
+}
+
+// =============================
+// ЗАГРУЗКА ЗАДАНИЯ
+// =============================
+
+function loadQuestion() {
+
+  if (questionIndex >= questions.length) {
+    finishLevel();
+    return;
+  }
+
+  const q = questions[questionIndex];
+
+  answer = normalize(q.answer);
+  guessed = [];
+  mistakes = 0;
+  finished = false;
+  hintUsed = false;
+
+  document.getElementById("levelNumber").textContent =
+    "УРОВЕНЬ " + (currentLevel + 1);
+
+  document.getElementById("levelTitle").textContent =
+    levelNames[currentLevel];
+
+  document.getElementById("question").textContent =
+    q.question;
+
+  document.getElementById("questionType").textContent =
+    q.type === "example"
+      ? "ПРИМЕР / ФОРМУЛА"
+      : "МАТЕМАТИЧЕСКОЕ ОПРЕДЕЛЕНИЕ";
+
+  document.getElementById("hintText").textContent =
+    "Подсказка доступна за 2 балла.";
+
+  document.getElementById("feedback").className = "feedback";
+
+  document.getElementById("nextButton").disabled = true;
+  document.getElementById("hintButton").disabled = false;
+
+  createKeyboard();
+  updateDisplay();
+}
+
+// =============================
+// КЛАВИАТУРА
+// =============================
+
+function createKeyboard() {
+  const keyboard = document.getElementById("keyboard");
+
+  keyboard.innerHTML = "";
+
+  alphabet.forEach(letter => {
+    const button = document.createElement("button");
+
+    button.className = "key";
+    button.textContent = letter.toUpperCase();
+
+    button.onclick = () => guessLetter(letter);
+
+    keyboard.appendChild(button);
+  });
+}
+
+function guessLetter(letter) {
+
+  if (finished || guessed.includes(letter)) return;
+
+  guessed.push(letter);
+
+  if (answer.includes(letter)) {
+    stats.score++;
+  } else {
+    mistakes++;
+    stats.wrong++;
+
+    if (mistakes >= 6) {
+      endRound(false);
+    }
+  }
+
+  if ([...answer].every(
+    c => c === " " || guessed.includes(c)
+  )) {
+    endRound(true);
+  }
+
+  saveData();
+  updateDisplay();
+}
+
+// =============================
+// ОБНОВЛЕНИЕ ЭКРАНА
+// =============================
+
+function updateDisplay() {
+
+  document.getElementById("score").textContent =
+    stats.score;
+
+  document.getElementById("solved").textContent =
+    stats.solved;
+
+  document.getElementById("mistakes").textContent =
+    `Ошибки: ${mistakes}/6`;
+
+  const word = document.getElementById("word");
+
+  word.innerHTML = "";
+
+  [...answer].forEach(letter => {
+    const span = document.createElement("span");
+
+    if (letter === " ") {
+      span.className = "letter space";
+    } else {
+      span.className = "letter";
+
+      span.textContent =
+        guessed.includes(letter) || finished
+          ? letter.toUpperCase()
+          : "";
+    }
+
+    word.appendChild(span);
+  });
+
+  const buttons =
+    document.querySelectorAll(".key");
+
+  buttons.forEach(button => {
+    const letter = normalize(button.textContent);
+
+    button.disabled =
+      guessed.includes(letter) || finished;
+
+    button.classList.toggle(
+      "good",
+      guessed.includes(letter) && answer.includes(letter)
+    );
+
+    button.classList.toggle(
+      "bad",
+      guessed.includes(letter) && !answer.includes(letter)
+    );
+  });
+
+  const bodyParts = [
+    "head", "body", "arm1",
+    "arm2", "leg1", "leg2"
+  ];
+
+  bodyParts.forEach((id, index) => {
+    document.getElementById(id).classList.toggle(
+      "show",
+      index < mistakes
+    );
+  });
+
+  document.getElementById("progress").style.width =
+    (questionIndex / questions.length * 100) + "%";
+}
+
+// =============================
+// ЗАВЕРШЕНИЕ РАУНДА
+// =============================
+
+function endRound(won) {
+
+  if (finished) return;
+
+  finished = true;
+  stats.played++;
+
+  const feedback =
+    document.getElementById("feedback");
+
+  if (won) {
+    stats.solved++;
+    stats.score += 5;
+
+    feedback.className = "feedback show success";
+
+    feedback.innerHTML =
+      "<b>🎉 Правильно!</b><br>" +
+      "Ты угадал слово! +5 баллов.";
+  } else {
+    feedback.className = "feedback show failure";
+
+    feedback.innerHTML =
+      "<b>Попытки закончились!</b><br>" +
+      "Правильный ответ: <b>" +
+      answer.toUpperCase() +
+      "</b><br>" +
+      questions[questionIndex].hint;
+  }
+
+  document.getElementById("nextButton").disabled = false;
+  document.getElementById("hintButton").disabled = true;
+
+  saveData();
+  updateDisplay();
+}
+
+function nextQuestion() {
+  questionIndex++;
+  loadQuestion();
+}
+
+// =============================
+// ПОДСКАЗКА
+// =============================
+
+function useHint() {
+
+  if (finished || hintUsed) return;
+
+  hintUsed = true;
+
+  stats.score = Math.max(0, stats.score - 2);
+
+  document.getElementById("hintText").textContent =
+    "💡 " + questions[questionIndex].hint;
+
+  document.getElementById("hintButton").disabled = true;
+
+  saveData();
+  updateDisplay();
+}
+
+// =============================
+// ЗАВЕРШЕНИЕ УРОВНЯ
+// =============================
+
+function finishLevel() {
+
+  document.getElementById("questionType").textContent =
+    "УРОВЕНЬ ЗАВЕРШЁН";
+
+  document.getElementById("question").textContent =
+    "Отличная работа! Все задания пройдены.";
+
+  document.getElementById("hintText").textContent =
+    "Выбери другой уровень или начни этот заново.";
+
+  document.getElementById("keyboard").innerHTML = "";
+  document.getElementById("word").innerHTML = "";
+
+  document.getElementById("feedback").className =
+    "feedback show info";
+
+  document.getElementById("feedback").textContent =
+    "🏆 Поздравляем! Ты завершил уровень.";
+
+  document.getElementById("nextButton").disabled = true;
+  document.getElementById("hintButton").disabled = true;
+
+  document.getElementById("progress").style.width = "100%";
+}
+
+// =============================
+// РЕДАКТОР УЧИТЕЛЯ
+// =============================
+
+function openEditor() {
+  renderCustom();
+  document.getElementById("editor").classList.add("open");
+}
+
+function closeEditor() {
+  document.getElementById("editor").classList.remove("open");
+}
+
+function addQuestion() {
+
+  const level =
+    Number(document.getElementById("editLevel").value);
+
+  const type =
+    document.getElementById("editType").value;
+
+  const question =
+    document.getElementById("editQuestion").value.trim();
+
+  const answer = normalize(
+    document.getElementById("editAnswer").value.trim()
+  );
+
+  const hint =
+    document.getElementById("editHint").value.trim();
+
+  if (!question || !answer) {
+    alert("Заполни вопрос и ответ.");
+    return;
+  }
+
+  if (!/^[а-я]+$/i.test(answer)) {
+    alert("Ответ должен состоять из одного слова русскими буквами.");
+    return;
+  }
+
+  customQuestions.push({
+    id: Date.now(),
+    level,
+    type,
+    question,
+    answer,
+    hint: hint || "Подумай над математическим термином."
+  });
+
+  document.getElementById("editQuestion").value = "";
+  document.getElementById("editAnswer").value = "";
+  document.getElementById("editHint").value = "";
+
+  saveData();
+  renderCustom();
+
+  alert("Задание добавлено!");
+
+  if (currentLevel === level) {
+    startLevel(level);
+  }
+}
+
+function renderCustom() {
+
+  const container =
+    document.getElementById("customQuestions");
+
+  container.innerHTML = "";
+
+  if (customQuestions.length === 0) {
+    container.textContent =
+      "Пока нет собственных заданий.";
+    return;
+  }
+
+  customQuestions.forEach(q => {
+
+    const item = document.createElement("div");
+
+    item.className = "custom-item";
+
+    const description = document.createElement("span");
+    description.textContent =
+      levelNames[q.level] + ": " + q.question +
+      " Ответ: " + q.answer;
+
+    const remove = document.createElement("button");
+
+    remove.className = "white";
+    remove.textContent = "Удалить";
+
+    remove.onclick = () => {
+      customQuestions =
+        customQuestions.filter(x => x.id !== q.id);
+
+      saveData();
+      renderCustom();
+      startLevel(currentLevel);
+    };
+
+    item.append(description, remove);
+    container.appendChild(item);
+  });
+}
+
+// =============================
+// СТАТИСТИКА
+// =============================
+
+function showStats() {
+
+  document.getElementById("totalScore").textContent =
+    stats.score;
+
+  document.getElementById("totalSolved").textContent =
+    stats.solved;
+
+  document.getElementById("totalPlayed").textContent =
+    stats.played;
+
+  const accuracy = stats.played
+    ? Math.round(stats.solved / stats.played * 100)
+    : 0;
+
+  document.getElementById("accuracy").textContent =
+    accuracy + "%";
+
+  document.getElementById("statistics").classList.add("open");
+}
+
+function closeStats() {
+  document.getElementById("statistics").classList.remove("open");
+}
+
+// =============================
+// ЗАПУСК
+// =============================
+
+startLevel(0);
+
+</script>
+</body>
+</html>
